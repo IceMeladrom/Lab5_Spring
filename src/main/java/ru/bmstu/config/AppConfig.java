@@ -9,7 +9,11 @@ import org.springframework.core.env.Environment;
 import ru.bmstu.questions.Question;
 import ru.bmstu.questions.QuestionsParser;
 
+import java.io.IOException;
 import java.util.ArrayList;
+
+import static ru.bmstu.utils.Colors.ANSI_RED;
+import static ru.bmstu.utils.Colors.ANSI_RESET;
 
 @Configuration
 @ComponentScan("ru.bmstu")
@@ -22,7 +26,14 @@ public class AppConfig {
     public ArrayList<Question> getQuestions() {
         QuestionsParser questionsParser = new QuestionsParser();
         questionsParser.setQuestionsFilename(env.getProperty("questionsFilename"));
-        return questionsParser.parse();
+        ArrayList<Question> questions = null;
+        try {
+            questions = questionsParser.parse();
+        } catch (IOException | IllegalArgumentException e) {
+            System.out.println(ANSI_RED + e.getMessage() + ANSI_RESET);
+            System.exit(1);
+        }
+        return questions;
     }
 
 }

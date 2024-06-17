@@ -26,6 +26,7 @@ public class QuizGame {
     private Integer minPercentageOfCorrectAnswers;
     private Integer correctAnswersCounter = 0;
 
+
     public void game() {
         String myAnswer;
         final ArrayList<String> colors = new ArrayList<>() {{

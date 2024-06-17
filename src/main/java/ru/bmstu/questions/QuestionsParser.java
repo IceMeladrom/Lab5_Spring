@@ -14,16 +14,13 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.ArrayList;
 
-import static ru.bmstu.utils.Colors.ANSI_RED;
-import static ru.bmstu.utils.Colors.ANSI_RESET;
-
 @Getter
 @Setter
 @Component
 public class QuestionsParser {
     private String questionsFilename;
 
-    public ArrayList<Question> parse() {
+    public ArrayList<Question> parse() throws IOException, IllegalArgumentException {
         ArrayList<Question> questions = new ArrayList<>();
         Iterable<CSVRecord> csvRecords = null;
         ClassPathResource resource = new ClassPathResource(questionsFilename);
@@ -34,12 +31,16 @@ public class QuestionsParser {
 
             csvRecords = CSVFormat.EXCEL.builder().setDelimiter(';').setHeader().setSkipHeaderRecord(true).build().parse(reader);
         } catch (IOException e) {
-            System.out.println(ANSI_RED + e.getLocalizedMessage() + ANSI_RESET);
-            System.exit(1);
+            throw new IOException(e);
         }
 
         for (CSVRecord csvRecord : csvRecords) {
-            Question question = getQuestion(csvRecord);
+            Question question = null;
+            try {
+                question = getQuestion(csvRecord);
+            } catch (IllegalArgumentException e) {
+                throw new IllegalArgumentException("Headers in a csv file in this format [Question;Option 1;Option 2;Option 3;Option 4;Answer]\nEdit your csv file and try again!");
+            }
             questions.add(question);
         }
 
