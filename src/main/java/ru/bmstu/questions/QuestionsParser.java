@@ -1,22 +1,33 @@
 package ru.bmstu.questions;
 
+import lombok.Getter;
+import lombok.Setter;
 import lombok.SneakyThrows;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.annotation.Value;
+
 
 import java.io.*;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 
 import org.apache.commons.io.input.BOMInputStream;
 
+@Getter
+@Setter
 @Component
+@PropertySource("classpath:questionsParser.properties")
 public class QuestionsParser {
+    @Value("${questionsFilename}")
+    private String questionsFilename;
+
     @SneakyThrows
     public ArrayList<Question> parse() {
         ClassPathResource resource = new ClassPathResource("questions.csv");
+//        ClassPathResource resource = new ClassPathResource(questionsFilename);
         InputStream inputStream = resource.getInputStream();
         BOMInputStream bomInputStream = new BOMInputStream(inputStream);
         Reader reader = new InputStreamReader(bomInputStream);
