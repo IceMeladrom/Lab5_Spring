@@ -21,25 +21,20 @@ public class QuestionsParser {
     private String questionsFilename;
 
     public ArrayList<Question> parse() throws IOException, IllegalArgumentException {
-        ArrayList<Question> questions = new ArrayList<>();
-        Iterable<CSVRecord> csvRecords = null;
         ClassPathResource resource = new ClassPathResource(questionsFilename);
-        try {
-            InputStream inputStream = resource.getInputStream();
-            BOMInputStream.Builder bomInputStream = BOMInputStream.builder().setInputStream(inputStream);
-            Reader reader = new InputStreamReader(bomInputStream.get());
+        InputStream inputStream = resource.getInputStream();
+        BOMInputStream.Builder bomInputStream = BOMInputStream.builder().setInputStream(inputStream);
+        Reader reader = new InputStreamReader(bomInputStream.get());
 
-            csvRecords = CSVFormat.EXCEL.builder().setDelimiter(';').setHeader().setSkipHeaderRecord(true).build().parse(reader);
-        } catch (IOException e) {
-            throw new IOException(e);
-        }
+        ArrayList<Question> questions = new ArrayList<>();
+        Iterable<CSVRecord> csvRecords = CSVFormat.EXCEL.builder().setDelimiter(';').setHeader().setSkipHeaderRecord(true).build().parse(reader);
 
         for (CSVRecord csvRecord : csvRecords) {
             Question question = null;
             try {
                 question = getQuestion(csvRecord);
             } catch (IllegalArgumentException e) {
-                throw new IllegalArgumentException("Headers in a csv file in this format [Question;Option 1;Option 2;Option 3;Option 4;Answer]\nEdit your csv file and try again!");
+                throw new IllegalArgumentException("Headers in a csv file must be in this format [Question;Option 1;Option 2;Option 3;Option 4;Answer]\nEdit your csv file and try again!");
             }
             questions.add(question);
         }
