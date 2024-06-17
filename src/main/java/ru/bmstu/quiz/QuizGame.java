@@ -4,7 +4,9 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.stereotype.Service;
 import ru.bmstu.questions.Question;
 import ru.bmstu.utils.MyScanner;
 
@@ -15,10 +17,13 @@ import static ru.bmstu.utils.Colors.*;
 @Getter
 @Setter
 @ToString
-@Component
+@Service
+@PropertySource("classpath:questions.properties")
 public class QuizGame {
     @Autowired
     private ArrayList<Question> questions;
+    @Value("${minPercentageOfCorrectAnswers}")
+    private Integer minPercentageOfCorrectAnswers;
     private Integer correctAnswersCounter = 0;
 
     public void game() {
@@ -66,6 +71,6 @@ public class QuizGame {
     }
 
     private boolean summarizing(Integer correctAnswersCounter) {
-        return correctAnswersCounter * 100 / questions.size() >= 60;
+        return correctAnswersCounter * 100 / questions.size() >= minPercentageOfCorrectAnswers;
     }
 }

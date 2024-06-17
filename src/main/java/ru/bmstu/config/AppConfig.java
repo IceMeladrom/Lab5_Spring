@@ -13,7 +13,7 @@ import java.util.ArrayList;
 
 @Configuration
 @ComponentScan("ru.bmstu")
-@PropertySource("classpath:questionsParser.properties")
+@PropertySource("classpath:questions.properties")
 public class AppConfig {
     @Autowired
     Environment env;
@@ -24,4 +24,5 @@ public class AppConfig {
         questionsParser.setQuestionsFilename(env.getProperty("questionsFilename"));
         return questionsParser.parse();
     }
+
 }

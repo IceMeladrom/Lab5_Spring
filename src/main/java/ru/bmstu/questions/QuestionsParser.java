@@ -5,7 +5,6 @@ import lombok.Setter;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.io.input.BOMInputStream;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 
@@ -22,7 +21,6 @@ import static ru.bmstu.utils.Colors.ANSI_RESET;
 @Setter
 @Component
 public class QuestionsParser {
-    @Value("${questionsFilename}")
     private String questionsFilename;
 
     public ArrayList<Question> parse() {
