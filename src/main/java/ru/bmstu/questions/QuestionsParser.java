@@ -5,35 +5,42 @@ import lombok.Setter;
 import lombok.SneakyThrows;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
-import org.springframework.context.annotation.PropertySource;
+import org.apache.commons.io.input.BOMInputStream;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
-import org.springframework.beans.factory.annotation.Value;
 
-
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.ArrayList;
 
-import org.apache.commons.io.input.BOMInputStream;
+import static ru.bmstu.utils.Colors.ANSI_RED;
+import static ru.bmstu.utils.Colors.ANSI_RESET;
 
 @Getter
 @Setter
 @Component
-@PropertySource("classpath:questionsParser.properties")
 public class QuestionsParser {
     @Value("${questionsFilename}")
     private String questionsFilename;
 
-    @SneakyThrows
     public ArrayList<Question> parse() {
-        ClassPathResource resource = new ClassPathResource("questions.csv");
-//        ClassPathResource resource = new ClassPathResource(questionsFilename);
-        InputStream inputStream = resource.getInputStream();
-        BOMInputStream bomInputStream = new BOMInputStream(inputStream);
-        Reader reader = new InputStreamReader(bomInputStream);
-
         ArrayList<Question> questions = new ArrayList<>();
-        Iterable<CSVRecord> csvRecords = CSVFormat.EXCEL.builder().setDelimiter(';').setHeader().setSkipHeaderRecord(true).build().parse(reader);
+        Iterable<CSVRecord> csvRecords = null;
+        ClassPathResource resource = new ClassPathResource(questionsFilename);
+        try {
+            InputStream inputStream = resource.getInputStream();
+            BOMInputStream.Builder bomInputStream = BOMInputStream.builder().setInputStream(inputStream);
+            Reader reader = new InputStreamReader(bomInputStream.get());
+
+            csvRecords = CSVFormat.EXCEL.builder().setDelimiter(';').setHeader().setSkipHeaderRecord(true).build().parse(reader);
+        } catch (IOException e) {
+            System.out.println(ANSI_RED + e.getLocalizedMessage() + ANSI_RESET);
+            System.exit(1);
+        }
+
         for (CSVRecord csvRecord : csvRecords) {
             Question question = getQuestion(csvRecord);
             questions.add(question);
@@ -55,7 +62,6 @@ public class QuestionsParser {
             add(option3);
             add(option4);
         }};
-        Question question = new Question(questionTitle, options, answer);
-        return question;
+        return new Question(questionTitle, options, answer);
     }
 }
